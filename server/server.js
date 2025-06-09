@@ -25,6 +25,4 @@ app.use("/api/clerk", clerkWebhooks);
 
 app.get('/', (req, res)=> res.send("API is Working fine"))
 
-const PORT = process.env.PORT || 3000;
-
-app.listen(PORT, ()=> console.log(`Server running on port ${PORT}`));
+export default app;

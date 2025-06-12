@@ -8,7 +8,7 @@ const userSchema = mongoose.Schema({
     role: {type: String, enum: ["user", "hotelOwner"], default:"user"},
     recentSearchedCities: [{type: String, required: true}],
 
-},{timeStamps: true}
+},{timeStamps: true} 
 );
 
 const User = mongoose.model("User", userSchema);

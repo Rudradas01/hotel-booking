@@ -8,7 +8,9 @@ const connectDB = async () => {
   try {
     const conn = await mongoose.connect(`${process.env.MONGODB_URI}/hotel-booking`, {
       useNewUrlParser: true,
-      useUnifiedTopology: true,  
+      useUnifiedTopology: true, 
+      connectTimeoutMS: 70000,
+      socketTimeoutMS: 70000,
     });
 
     isConnected = true;

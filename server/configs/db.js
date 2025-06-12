@@ -8,7 +8,7 @@ const connectDB = async () => {
   try {
     const conn = await mongoose.connect(`${process.env.MONGODB_URI}/hotel-booking`, {
       useNewUrlParser: true,
-      useUnifiedTopology: true, 
+      useUnifiedTopology: true,  
     });
 
     isConnected = true;

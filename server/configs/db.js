@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 let isConnected = false;
 
 const connectDB = async () => {
-  if (isConnected) return; 
+  if (isConnected) return;  
  
   try {
     const conn = await mongoose.connect(`${process.env.MONGODB_URI}/hotel-booking`, {

@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 let isConnected = false;
 
 const connectDB = async () => {
+<<<<<<< HEAD
   if (isConnected) return;  
  
   try {
@@ -13,6 +14,16 @@ const connectDB = async () => {
       socketTimeoutMS: 70000,
     });
 
+=======
+  if (isConnected) return;
+
+  try {
+    const conn = await mongoose.connect(`${process.env.MONGODB_URI}/hotel-booking`, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+
+>>>>>>> f4b7a28 (added)
     isConnected = true;
     console.log(`MongoDB connected: ${conn.connection.host}`);
   } catch (error) {
@@ -21,4 +32,8 @@ const connectDB = async () => {
   }
 };
 
+<<<<<<< HEAD
 export default connectDB;
+=======
+export default connectDB;
+>>>>>>> f4b7a28 (added)

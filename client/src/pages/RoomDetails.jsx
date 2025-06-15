@@ -1,19 +1,84 @@
 import React, {  useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { assets, facilityIcons, roomCommonData, roomsDummyData } from '../assets/assets'
+import { assets, facilityIcons, roomCommonData, } from '../assets/assets'
 import StarRating from '../components/StarRating'
+import { useAppContext } from '../context/AppContext'
+import toast from 'react-hot-toast'
 
 const RoomDetails = () => {
     const {id} = useParams()
+    const {rooms, getToken, axios, navigate} = useAppContext()
     const [room, setRoom] = useState(null)
     const [mainImage, setMainImage] = useState(null)
+    const [checkInDate, setCheckInDate] = useState(null);
+    const [checkOutDate, setCheckOutDate] = useState(null);
+    const [guests, setGuests] = useState(1);
+
+    const [isAvailable, setIsAvailable] = useState(false);
+
+    //check if the Room is Available
+
+    const checkAvailability = async ()=>{
+        try{
+            //check is Check-In date is greater than checkout date
+            if(checkInDate >= checkOutDate){
+                toast.error('Check-In Date should be less than Check-Out Date')
+                return;
+
+            }
+            const {data} = await axios.post('/api/bookings/check-availability',{room: id, checkInDate, checkOutDate})
+                if(data.success){
+                    if(data.isAvailable){
+                        setIsAvailable(true)
+                        toast.success('Room is available')
+                    }else {
+                        setIsAvailable(false)
+                        toast.error('Room is not available')
+                    }
+                } else {
+                    toast.error(data.message)
+                }
+
+        } catch(error) {
+            toast.error(error.message)
+
+        }
+    }
+
+    // on submitHandler function to check availability & book the room
+
+    const onSubmitHandler = async (e)=>{
+        try{
+            e.preventDefault();
+            if(!isAvailable){
+                return checkAvailability();
+            } else {
+                const {data} = await axios.post('/api/bookings/book',{room: id,
+                    checkInDate, checkOutDate, guests, paymentMethod: "Pay At Hotel"},
+                {headers: {Authorization: `Bearer ${await getToken()}`}})
+                if(data.success){
+                    toast.success(data.message)
+                    navigate('/my-bookings')
+                    scrollTo(0,0)
+                }else{
+                    toast.error(data.message)
+                }
+            }
+        } catch (error) {
+            toast.error(error.message)
+        }
+    }
 
 
-    useEffect(() => {
-       const room = roomsDummyData.find(room => room._id === id)
-       room && setRoom(room)
-       room && setMainImage(room.images[0])
-    },[])
+
+    useEffect(()=>{
+        const room = rooms.find(room => room._id === id )
+        room && setRoom(room)
+        room && setMainImage(room.images[0]) 
+    },[rooms])
+
+
+   
 
   return room && (
     <div className='py-28 md:py-35 px-4 md:px-16 lg:px-24 xl:px-32' >
@@ -80,7 +145,7 @@ const RoomDetails = () => {
 
     {    /* CheckIn CheckOut form*/}
 
-    <form className='flex flex-col md:flex-row items-start md:items-center
+    <form onSubmit={onSubmitHandler} className='flex flex-col md:flex-row items-start md:items-center
     justify-between bg-white shadow-[0px_0px_20px_rgba(0,0,0,0.15)] p-6 rounded-xl
     mx-auto mt-16 max-w-6xl' >
         <div className='flex flex-col flex-wrap md:flex-row items-start
@@ -88,8 +153,9 @@ const RoomDetails = () => {
 
 
         <div className='flex flex-col' >
-            <label htmlFor="checkInDate" className='font-medium' >CheckIn</label>
-            <input type="date" id='checkInDate' placeholder='Check-In'
+            <label htmlFor="checkInDate" className='font-medium' >Check-In</label>
+            <input onChange={(e)=>setCheckInDate(e.target.value)}
+            min={new Date().toISOString().split('T')[0]} type="date" id='checkInDate' placeholder='Check-In'
             className='w-full rounded border border-gray-300 px-3 py-2 mt-1.5
             outline-none' required />
         </div>
@@ -102,7 +168,7 @@ const RoomDetails = () => {
 
         <div className='flex flex-col' >
             <label htmlFor="checkOutDate" className='font-medium' >CheckOut</label>
-            <input type="date" id='checkOutDate' placeholder='Check-Out'
+            <input onChange={(e)=>setCheckOutDate(e.target.value)} min={checkInDate} disabled={!checkInDate} type="date" id='checkOutDate' placeholder='Check-Out'
             className='w-full rounded border border-gray-300 px-3 py-2 mt-1.5
             outline-none' required />
         </div>
@@ -112,7 +178,7 @@ const RoomDetails = () => {
 
         <div className='flex flex-col' >
             <label htmlFor="guests" className='font-medium' >Guests</label>
-            <input type="number" id='guests' placeholder='Check-Out'
+            <input onChange={(e)=>setGuests(e.target.value)} value={guests} type="number" id='guests' placeholder='1'
             className='w-full rounded border border-gray-300 px-3 py-2 mt-1.5
             outline-none' required />
         </div>
@@ -123,7 +189,7 @@ const RoomDetails = () => {
         <button type='Submit' className='bg-primary hover:bg-primary-dull
         active:scale-95 transition-all text-white rounded-md max-md:w-full
         max-md:mt-6 md:px-25 py-3 md:py-4 text-base cursor-pointer'>
-            Check Availability
+            {isAvailable ? "Book Now" : "CheckAvailability"}
         </button>
     </form>
 

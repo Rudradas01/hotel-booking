@@ -2,12 +2,11 @@ import React, {useState} from 'react'
 import Title from '../../components/Title'
 import { assets, } from '../../assets/assets'
 import { useAppContext } from '../../context/AppContext'
-import toast from 'react-hot-toast'
 import { useEffect } from 'react'
 
 const Dashboard = () => {
 
-    const { currency , user, getToken, tost, axios } = useAppContext();
+    const { currency , user, getToken, toast, axios } = useAppContext();
 
     const [dashboardData, setDashboardData] = useState({
         bookings: [],
@@ -96,7 +95,7 @@ const Dashboard = () => {
 
                             <td className='py-3 px-4 text-gray-700 border-t border-gray-300
                             max-sm:hidden'  >
-                                {item.user.roomType}
+                                {item.room.roomType}
                             </td>
 
                             <td className='py-3 px-4 text-gray-700 border-t border-gray-300
